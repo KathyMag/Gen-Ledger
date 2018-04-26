@@ -1,0 +1,117 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.ServiceModel;
+using System.ServiceModel.Activation;
+using System.ServiceModel.Web;
+using System.Text;
+
+[ServiceContract(Namespace = "Chart")]
+[AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
+public class Chart
+{
+    private static string connectionString = ConfigurationManager.ConnectionStrings["SBUINVConnectionString"].ToString();
+    private static SqlDataReader reader;
+
+    public string Item_Description;
+    public string Qty;
+    public string Purchase_Date;
+
+    public string label { get; set; }
+    public string value { get; set; }
+    public string color { get; set; }
+    public string hightlight { get; set; }
+
+    //[WebMethod]
+    public List<Chart> getTrafficSourceData(List<string> gData)
+    {
+        List<Chart> t = new List<Chart>();
+        string[] arrColor = new string[] { "#231F20", "#FFC200", "#F44937", "#16F27E", "#FC9775", "#5A69A6" };
+
+        using (SqlConnection con = new SqlConnection(connectionString))
+        {
+            using (SqlCommand cmd = new SqlCommand())
+            {
+                cmd.CommandText = "GetDetails_TestPurchases";
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Connection = con;
+                cmd.Parameters.AddWithValue("@date_from", gData[0]);
+                cmd.Parameters.AddWithValue("@date_to", gData[1]);
+                cmd.Parameters.AddWithValue("@forDashboard", "Yes");
+                con.Open();
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    int counter = 0;
+                    while (dr.Read())
+                    {
+                        Chart tsData = new Chart();
+                        tsData.value = dr["[Item Description]"].ToString();
+                        tsData.label = dr["[Qty]"].ToString();
+                        tsData.color = arrColor[counter];
+                        t.Add(tsData);
+                        counter++;
+                    }
+                }
+            }            
+        }
+        return t;
+    }
+    //public List<Chart> getListOfCars(List<string> aData)
+    //{
+    //    SqlDataReader dr;
+    //    List<Chart> purchases = new List<Chart>();
+
+    //    using (SqlConnection con = new SqlConnection(connectionString))
+    //    {
+    //        using (SqlCommand cmd = new SqlCommand())
+    //        {
+    //            cmd.CommandText = "GetDetails_TestPurchases";
+    //            cmd.CommandType = CommandType.StoredProcedure;
+    //            cmd.Connection = con;
+    //            cmd.Parameters.AddWithValue("@date_from", aData[0]);
+    //            cmd.Parameters.AddWithValue("@date_to", aData[0]);
+    //            cmd.Parameters.AddWithValue("@forDashboard", "Yes");
+    //            con.Open();
+    //            dr = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+    //            if (dr.HasRows)
+    //            {
+    //                while (dr.Read())
+    //                {
+    //                    string itemDescription = dr["Item Description"].ToString();
+    //                    string qty = dr["Qty"].ToString();
+    //                    string purchaseDate = dr["Purchase Date"].ToString();
+
+    //                    purchases.Add(new Chart
+    //                    {
+    //                        Item_Description = itemDescription,
+    //                        Qty = qty,
+    //                        Purchase_Date = purchaseDate
+    //                    });
+    //                }
+    //            }
+    //            con.Close();
+    //        }
+    //    }
+    //    return purchases;
+    //}
+
+
+    //// To use HTTP GET, add [WebGet] attribute. (Default ResponseFormat is WebMessageFormat.Json)
+    //// To create an operation that returns XML,
+    ////     add [WebGet(ResponseFormat=WebMessageFormat.Xml)],
+    ////     and include the following line in the operation body:
+    ////         WebOperationContext.Current.OutgoingResponse.ContentType = "text/xml";
+    //[OperationContract]
+    //public void DoWork()
+    //{
+    //    // Add your operation implementation here
+    //    return;
+    //}
+
+    //// Add more operations here and mark them with [OperationContract]
+}

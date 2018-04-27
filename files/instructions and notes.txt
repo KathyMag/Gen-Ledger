@@ -1,0 +1,12 @@
+git repository: https://github.com/KathyMag/Gen-Ledger
+check out ka and then religiously do the ff.
+1. build DB by running the latest db_build_ script
+2. script DB if there are changes in the database and include the generated script on the checkin. follow DB_to_Script.doc instruction and incremental numbering based on the latest GIT checked in db_build file
+3. review sample data January 2018.xlsx
+
+January 2018 file
+1. sheets for data setup/lookup reference: Staff ID, USER ID, TR, GL Entries, Entry
+2. sheets for data entry modules in GridView na lang kasi preferred ng user na parang excel din: Cash(ako na bahala dito) and all sheets with maroon (BPI, BPI-E, BDO, BDO-E, DINERS, etc)
+3. all sheets in maroon have columns with formula, please implement, and put it on a lable. pag walang formula, matik na for data input/entry sya, textbox na sya bali.
+4. kindly note ung "Set up" and "Apply payment" sa pinaka baba ng mga data on maroon sheets, computed naman yon.
+5. see GL-headers.jpg
